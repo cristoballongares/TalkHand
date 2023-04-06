@@ -1,48 +1,58 @@
+import cv2
 import os
+import numpy as np
 import pickle
 import mediapipe as mp
-import cv2
 
-
-mp_hands = mp.solutions.hands
+# Cargar el modelo de detección de manos de Mediapipe
 mp_drawing = mp.solutions.drawing_utils
-mp_drawing_styles = mp.solutions.drawing_styles
+mp_hands = mp.solutions.hands
 
-hands = mp_hands.Hands(static_image_mode=True, min_detection_confidence=0.3)
+# Ruta a la carpeta con las imágenes
+data_dir = "data"
 
-DATA_DIR = './data'
+num_images = 2000
 
-data = []
+features = []
 labels = []
-for dir_ in os.listdir(DATA_DIR):
-    for img_path in os.listdir(os.path.join(DATA_DIR, dir_)):
-        data_aux = []
 
-        x_ = []
-        y_ = []
-
-        img = cv2.imread(os.path.join(DATA_DIR, dir_, img_path))
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-        results = hands.process(img_rgb)
-        if results.multi_hand_landmarks:
+for label in range(5):
+    label_dir = os.path.join(data_dir, str(label))
+    
+    for i in range(num_images):
+        img_path = os.path.join(label_dir, f"{i}.jpg")
+        img = cv2.imread(img_path)
+        
+        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+        with mp_hands.Hands(
+            static_image_mode=True, max_num_hands=2, min_detection_confidence=0.5) as hands:
+            
+            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            results = hands.process(img_rgb)
+            
+            if not results.multi_hand_landmarks:
+                continue
+            
+            annotated_image = img.copy()
             for hand_landmarks in results.multi_hand_landmarks:
-                for i in range(len(hand_landmarks.landmark)):
-                    x = hand_landmarks.landmark[i].x
-                    y = hand_landmarks.landmark[i].y
-
-                    x_.append(x)
-                    y_.append(y)
-
-                for i in range(len(hand_landmarks.landmark)):
-                    x = hand_landmarks.landmark[i].x
-                    y = hand_landmarks.landmark[i].y
-                    data_aux.append(x - min(x_))
-                    data_aux.append(y - min(y_))
-
-            data.append(data_aux)
-            labels.append(dir_)
-
-f = open('data.pickle', 'wb')
-pickle.dump({'data': data, 'labels': labels}, f)
-f.close()
+                mp_drawing.draw_landmarks(
+                    annotated_image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+            
+            hand_landmarks = results.multi_hand_landmarks[0]
+            hand_features = []
+            for lm in hand_landmarks.landmark:
+                hand_features.append(lm.x)
+                hand_features.append(lm.y)
+                hand_features.append(lm.z)
+            features.append(hand_features)
+            labels.append(label)
+            
+            # Guardamos la imagen con los puntos de referencia dibujados
+            cv2.imwrite(f"annotated/{label}_{i}.jpg", annotated_image)
+            
+# Guardamos las características y etiquetas en archivos pickle
+with open("features.pkl", "wb") as f:
+    pickle.dump(features, f)
+with open("labels.pkl", "wb") as f:
+    pickle.dump(labels, f)
