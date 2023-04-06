@@ -1,0 +1,56 @@
+import cv2
+import mediapipe as mp
+import pickle
+import numpy as np
+
+# Cargar el modelo guardado
+with open('my_model.pkl', 'rb') as f:
+    clf = pickle.load(f)
+
+# Crear un diccionario para mapear las etiquetas a las letras
+labels_dict = {0: 'A', 1: 'E', 2: 'I', 3: 'O', 4: 'U'}
+
+# Inicializar la detección de manos de Mediapipe
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.7)
+
+# Inicializar la captura de video con OpenCV
+cap = cv2.VideoCapture(1)
+
+while True:
+    # Leer un fotograma de la cámara
+    ret, frame = cap.read()
+    
+    # Convertir la imagen de BGR a RGB
+    image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    
+    # Detección de manos con Mediapipe
+    results = hands.process(image)
+    
+    # Si se detectó al menos una mano
+    if results.multi_hand_landmarks:
+        # Obtener las coordenadas de los puntos de referencia de la mano
+        landmarks = results.multi_hand_landmarks[0].landmark
+        
+        # Convertir las coordenadas de los puntos de referencia en características
+        features = np.array([[landmark.x, landmark.y, landmark.z] for landmark in landmarks]).flatten()
+        
+        # Hacer una predicción con el modelo entrenado
+        label_id = clf.predict([features])[0]
+        
+        # Obtener la letra correspondiente a la etiqueta predicha
+        label = labels_dict[label_id]
+        
+        # Mostrar la letra en la pantalla
+        cv2.putText(frame, label, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+    
+    # Mostrar el fotograma en la pantalla
+    cv2.imshow('Sign Language Recognition', frame)
+    
+    # Salir si se presiona la tecla 'q'
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# Liberar la cámara y cerrar la ventana
+cap.release()
+cv2.destroyAllWindows()
