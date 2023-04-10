@@ -1,5 +1,6 @@
 # Ignorar la carpeta "data"
 data/
+oldmodels/
 
 # Ignorar los archivos específicos
 app.py
