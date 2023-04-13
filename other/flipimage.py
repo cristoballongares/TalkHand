@@ -1,7 +1,7 @@
 import os
 from PIL import Image
 
-root_dir = "imgchange"
+root_dir = "test"
 
 for folder_name in os.listdir(root_dir):
     folder_path = os.path.join(root_dir, folder_name)
