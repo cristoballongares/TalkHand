@@ -5,7 +5,7 @@ from PIL import Image
 input_folder = './data'
 
 # Ruta de la carpeta donde se guardarán las imágenes redimensionadas
-output_folder = './datanew2'
+output_folder = './datanew'
 
 # Tamaño de las imágenes redimensionadas
 new_size = (128, 128)

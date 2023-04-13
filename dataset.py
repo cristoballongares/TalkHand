@@ -9,20 +9,23 @@ mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
 # Ruta a la carpeta con las imágenes
-data_dir = "data"
+data_dir = "datanew"
 
-num_images = 2000
+num_images = 6000
 
 features = []
 labels = []
 
-for label in range(5):
+for label in range(10):
     label_dir = os.path.join(data_dir, str(label))
     
     for i in range(num_images):
         img_path = os.path.join(label_dir, f"{i}.jpg")
         img = cv2.imread(img_path)
-        
+        if img is None:
+            print(f"Error al leer la imagen: {img_path}")
+            continue
+
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         
         with mp_hands.Hands(

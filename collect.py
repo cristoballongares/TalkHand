@@ -30,8 +30,6 @@ for j in range(number_of_classes):
         ret, frame = cap.read()
         cv2.imshow('frame', frame)
         print(f'Tomando foto {counter + 1} de la clase {j}')
-        if counter == dataset_size // 2:
-            input("Presiona 1 para continuar...")
         cv2.waitKey(25)
         cv2.imwrite(os.path.join(DATA_DIR, str(j), '{}.jpg'.format(counter)), frame)
 
