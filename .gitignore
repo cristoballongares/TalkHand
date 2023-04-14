@@ -7,9 +7,11 @@ datat/
 collectimg/
 
 # Ignorar los archivos específicos
+app.py
 entrenador.py
 features.pkl
 labels.pkl
 model.p
 my_model.pkl
 collectimg/collect.exe
+.gitignore
