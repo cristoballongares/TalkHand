@@ -22,6 +22,7 @@ for label in range(8):
     for i in range(num_images):
         img_path = os.path.join(label_dir, f"{i+1}.jpg")
         img = cv2.imread(img_path)
+        img = cv2.resize(img, (200, 200))
         if img is None:
             print(f"Error al leer la imagen: {img_path}")
             continue

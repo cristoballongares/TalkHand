@@ -47,7 +47,7 @@ while True:
         cv2.putText(frame, label, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
     
     # Mostrar el fotograma en la pantalla
-    cv2.imshow('Sign Language Recognition', frame)
+    cv2.imshow('TalkHand', frame)
     
     # Salir si se presiona la tecla 'q'
     if cv2.waitKey(1) & 0xFF == ord('q'):
