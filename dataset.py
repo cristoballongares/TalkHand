@@ -16,7 +16,7 @@ num_images = 6000
 features = []
 labels = []
 
-for label in range(8):
+for label in range(14):
     label_dir = os.path.join(data_dir, str(label))
     
     for i in range(num_images):
